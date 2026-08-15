@@ -3,16 +3,25 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
-!vinpin_core.*.so
-*.egg-info/
-.pytest_cache/
-
-# Build artifacts
+!vinpin_core*.so
 build/
 dist/
+*.egg-info/
+
+# Nuitka
+*.bin
+*.exe
+*.c
+build/
+
+# Buildozer
+.buildozer/
 bin/
-.idea/
+.temp/
+
+# IDE
 .vscode/
+.idea/
 *.swp
 *.swo
 
@@ -20,19 +29,6 @@ bin/
 .DS_Store
 Thumbs.db
 
-# Buildozer
-.buildozer/
-*.spec~
-
-# Nuitka
-*.bin
-*.exe
-*.const
-*.onefile-build
-*.build
-
-# Git
-.git/
-
-# CI temp
+# 临时文件
+*.tmp
 .gitignore.tmp
