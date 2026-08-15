@@ -1,27 +1,56 @@
 name: Build APK
+
 on:
   workflow_dispatch:
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
-      - name: Deps
+          python-version: '3.10'
+
+      - name: Install system deps
         run: |
-          sudo apt update
-          sudo apt install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev build-essential
-          pip install --upgrade pip
-          pip install buildozer "cython<3"
-      - name: Accept licenses and install SDK
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            openjdk-17-jdk zip unzip git ca-certificates \
+            wget libncurses5 libstdc++6 zlib1g ccache
+
+      - name: Install Python deps
         run: |
-          yes | sdkmanager --licenses
-          sdkmanager "build-tools;33.0.2"
-      - name: Build
-        run: buildozer -v android debug
-      - uses: actions/upload-artifact@v4
+          python -m pip install --upgrade pip
+          pip install Cython==0.29.33 buildozer
+
+      - name: Verify buildozer
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          which buildozer
+          buildozer --version
+
+      - name: Build APK
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          buildozer -v android debug 2>&1 | tee build.log
+        timeout-minutes: 45
+
+      - name: Upload APK
+        if: success()
+        uses: actions/upload-artifact@v4
         with:
-          name: CheryVIN-APK
+          name: vin-app-apk
           path: bin/*.apk
+
+      - name: Upload build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
