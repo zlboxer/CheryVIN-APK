@@ -9,12 +9,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build APK with buildozer‑action
-        uses: kivy/buildozer-action@v1
+      - name: Build APK
+        uses: ArtemSBulgakov/buildozer-action@v1.2.0
         with:
           buildozer_args: android debug
 
-      - name: Upload apk
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: CheryVIN‑APK
