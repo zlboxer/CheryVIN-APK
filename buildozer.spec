@@ -1,7 +1,7 @@
 [app]
 title = 奇瑞VIN计算器
 package.name = vinpincalc
-package.domain = org.private
+package.domain = org.private.vinapp
 source.dir = .
 source.include_exts = py,kv
 version = 1.0
