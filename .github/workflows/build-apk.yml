@@ -4,52 +4,17 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-android:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v5
+      - name: Build APK with buildozer‑action
+        uses: kivy/buildozer-action@v1
         with:
-          python-version: '3.10'
+          buildozer_args: android debug
 
-      - name: Install system dependencies
-        run: |
-          sudo apt update -y
-          sudo apt install -y openjdk-17-jdk zip unzip git autoconf libtool pkg-config libffi-dev cmake wget
-
-      - name: Manually install Android cmdline‑tools
-        run: |
-          mkdir -p ~/.buildozer/android/platform/android-sdk
-          cd ~/.buildozer/android/platform/android-sdk
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip -q commandlinetools-linux-11076708_latest.zip
-          mv cmdline-tools latest
-          mkdir -p cmdline-tools
-          mv latest cmdline-tools/
-          export PATH=$PATH:$HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin
-
-          mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
-          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-          echo "84831b9409646a918e30573bab4c9c91346d8abd" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
-
-          sdkmanager --sdk_root=${HOME}/.buildozer/android/platform/android-sdk "platforms;android-33" "build-tools;34.0.0" "platform-tools"
-
-      - name: Install python build tools
-        run: |
-          python -m pip install --upgrade pip
-          pip install buildozer cython
-
-      - name: Build debug APK
-        env:
-          ANDROID_HOME: ${{HOME}}/.buildozer/android/platform/android-sdk
-          ANDROID_SDK_ROOT: ${{HOME}}/.buildozer/android/platform/android-sdk
-        run: |
-          buildozer android debug
-
-      - name: Upload built APK artifact
+      - name: Upload apk
         uses: actions/upload-artifact@v4
         with:
           name: CheryVIN‑APK
